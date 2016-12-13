@@ -12,6 +12,7 @@ def formatter(path, settings):
                 num - settings['First Store Column']) // settings['Number of Types']
                 * settings['Number of Types'] + settings['First Store Column']).value
         )
+    print ("Combining index columns")
     for index in settings["Index Columns"]:
         #sheet.unmerge_cells(start_row=settings["Type Row"] - 2, start_column=index + 1,
         #                    end_row=settings["Type Row"] - 2, end_column=index + 1)
@@ -26,6 +27,7 @@ def formatter(path, settings):
     return book
 
 def stacker(path, settings):
+    print("Stacking data")
     report = pd.read_excel(
         path,
         sheetname=settings["Sheet Name"],
@@ -35,10 +37,11 @@ def stacker(path, settings):
     return report.stack()
 
 def output(report, path):
-    # print "Saving workbook to " + path
+    print ("Saving workbook to " + path)
     report.to_frame(name="Values").to_csv(path)
 
 def format_file(inbound_path, settings_path, outbound_path):
+    print ("Getting settings")
     with open(settings_path) as file:
         settings = yaml.load(file)
     book = formatter(inbound_path, settings)

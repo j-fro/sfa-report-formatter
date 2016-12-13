@@ -2,29 +2,18 @@
 import os
 from flask import Flask, request, render_template, flash, redirect
 from werkzeug.utils import secure_filename
-from celery import Celery
 from stacker import format_file
+from threading import Thread
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])
 
 APP = Flask(__name__)
-APP.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-APP.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 APP.config['UPLOAD_FOLDER'] = 'uploads'
 APP.config['SECRET_KEY'] = 'a secret key that needs to be replaced'
-
-CELERY = Celery(APP.name, broker=APP.config['CELERY_BROKER_URL'])
-CELERY.conf.update(APP.config)
 
 def allowed_filename(filename):
     """Checks whether a file has an allowed extension"""
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-@CELERY.task
-def run_formatter(orig_filename, new_filename):
-    """Formats a file and outputs a new csv"""
-    flash(orig_filename, new_filename)
-    format_file(orig_filename, 'config.yml', new_filename)
 
 @APP.route('/', methods=['GET', 'POST'])
 def index():
@@ -42,8 +31,20 @@ def index():
         if file and allowed_filename(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            run_formatter.delay(filename, filename.rsplit('.', 1)[0] + '.csv')
+            thread = FormatThread(1, 'poo', os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            thread.start()
+            # run_formatter.delay(filename, filename.rsplit('.', 1)[0] + '.csv')
     return render_template('index.html')
+
+class FormatThread(Thread):
+    def __init__(self, threadID, name, file_name):
+        Thread.__init__(self)
+        self.name = name
+        self.threadID = threadID
+        self.file_name = file_name
+
+    def run(self):
+        format_file(self.file_name, 'config.yml', 'test.csv')
 
 if __name__ == '__main__':
     if not os.path.isdir('uploads'):

@@ -1,3 +1,7 @@
 "__pychache__/"
 uploads/
 .DS_Store
+*.pyc
+*.yml
+*.csv
+*.xlsx
