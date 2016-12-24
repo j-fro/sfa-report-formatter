@@ -2,7 +2,6 @@
 uploads/
 .DS_Store
 *.pyc
-*.yml
 *.csv
 *.xlsx
 .vscode/
