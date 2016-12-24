@@ -6,10 +6,7 @@
     </head>
     <body>
         <h1>Hello World</h1>
-        {% for message in get_flashed_messages() %}
-        <p style="color: red;">{{ message }}</p>
-        {% endfor %}
-        <p id="status"></p>
+        <p id="status">Starting Transform</p>
         <a id="download" href="/download">Download</a>
         <script type="text/javascript" src="{{
   url_for('static', filename='jquery-3.1.1.min.js') }}"></script>

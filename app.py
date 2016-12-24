@@ -18,6 +18,7 @@ def allowed_filename(filename):
 def index():
     """Base url"""
     if request.method == 'POST':
+        clear_uploads(APP.config['UPLOAD_FOLDER'])
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
@@ -48,6 +49,10 @@ def poll():
 def download():
     """Route to serve the transformed file back to the user"""
     return send_from_directory('', thread.output_file)
+
+def clear_uploads(upload_dir):
+    for f in os.listdir(upload_dir):
+        os.remove(os.path.join(upload_dir, f))
 
 if __name__ == '__main__':
     if not os.path.isdir('uploads'):
