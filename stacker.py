@@ -1,32 +1,34 @@
-import pandas as pd
-import xlrd
-from openpyxl import load_workbook
-from xlutils.copy import copy
-import yaml
+from threading import Thread
 import csv
+from time import sleep
+import pandas as pd
+from openpyxl import load_workbook
+import yaml
 
-# def formatter(path, settings):
-#     book = xlrd.open_workbook(path, on_demand=True)
-#     # book = copy(book)
-#     sheet = book.sheet_by_index(0)
-#     print("Formatting data.")
-#     for num in range(settings['First Store Column'], settings['Last Column']):
 
-#         sheet.cell(rowx=settings['Type Row'] - 1, colx=num).value += (
-#             "," + sheet.cell(rowx=settings['Store Row'] - 1, colx=(
-#                 num - settings['First Store Column']) // settings['Number of Types']
-#                              * settings['Number of Types'] + settings['First Store Column']).value
-#         )
-#         print(sheet.cell(rowx=settings['Type Row'] - 1, colx=num).value)
-#     print("Combining index columns")
-#     for index in settings["Index Columns"]:
-#         sheet.cell(rowx=settings["Type Row"], colx=index + 1).value = (
-#             sheet.cell(rowx=settings["Type Row"] + 2, colx=index + 1).value
-#         )
-#     sheet.cell(rowx=settings["Type Row"], colx=settings["Style Column"]).value = (
-#         sheet.cell(rowx=settings["Type Row"], colx=settings["Style Column"] - 1).value
-#     )
-#     return book
+class FormatThread(Thread):
+    def __init__(self, threadID, name):
+        Thread.__init__(self)
+        self.name = name
+        self.thread_id = threadID
+        self.file_name = ""
+        self.status = "Starting"
+        self.output_file = ""
+
+    def run(self):
+        self.output_file = self.file_name.rsplit('.', 1)[0] + '.csv'
+        self.status = "Getting Settings"
+        # format_file(self.file_name, 'config.yml', self.file_name.rsplit('.', 1)[0] + '.csv')
+        with open('config.yml') as settings_file:
+            settings = yaml.load(settings_file)
+            self.status = "Arranging Headers"
+        print(self.status)
+        self.status = formatter(self.file_name, settings, 'intermediate.csv')
+        print(self.status)
+        self.status = output(stacker('intermediate.csv', settings), 'intermediate.csv')
+        print(self.status)
+        self.status = final_formatting('intermediate.csv', self.output_file)
+        print(self.status)
 
 def formatter(inbound_path, settings, outbound_path):
     """Reads the excel sheet and formats it for later transformations.
@@ -47,6 +49,7 @@ def formatter(inbound_path, settings, outbound_path):
             else:
                 row = [c.value for c in row]
             writer.writerow(row)
+    return "Rotating"
 
 def combine_store_and_type(sheet, cell, col_num, settings):
     store = sheet.cell(row=settings['Store Row'], column=(
@@ -57,7 +60,7 @@ def combine_store_and_type(sheet, cell, col_num, settings):
     return str(cell.value) + ',' + store
 
 def stacker(path, settings):
-    print("Stacking data")
+    # print("Stacking data")
     report = pd.read_csv(
         path,
         header=settings["Type Row"] - 1,
@@ -66,8 +69,9 @@ def stacker(path, settings):
     return report.stack()
 
 def output(report, path):
-    print("Saving workbook to " + path)
+    # print("Saving workbook to " + path)
     report.to_frame(name="Values").to_csv(path)
+    return "Cleaning Up"
 
 def format_file(inbound_path, settings_path, outbound_path):
     print("Getting settings")
@@ -76,6 +80,7 @@ def format_file(inbound_path, settings_path, outbound_path):
     formatter(inbound_path, settings, 'intermediate.csv')
     output(stacker('intermediate.csv', settings), 'intermediate.csv')
     final_formatting('intermediate.csv', outbound_path)
+    print('Format complete. Saved to ' + outbound_path)
 
 def final_formatting(inbound_path, outbound_path):
     with open(inbound_path, 'r') as inbound_file:
@@ -87,6 +92,7 @@ def final_formatting(inbound_path, outbound_path):
                     writer.writerow(['Dept', 'Style', 'Type', 'Store', 'Values'])
                 else:
                     writer.writerow(row[:2] + row[2].split(',') + row[3:])
+    return "Complete"
 
 if __name__ == '__main__':
     with open("config.yml") as file:
