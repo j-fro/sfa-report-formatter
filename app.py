@@ -58,4 +58,6 @@ if __name__ == '__main__':
     if not os.path.isdir('uploads'):
         os.mkdir('uploads')
     thread = FormatThread()
+    port = int(os.environ.get('PORT', 5000))
+    APP.run(host='0.0.0.0', port=port)
     APP.run()
