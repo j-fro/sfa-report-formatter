@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Alegreya+Sans');
+body {
+    text-align: center;
+    font-family: 'Alegreya Sans', sans-serif;
+}
+
+h1 {
+    font-weight: normal;
+}
+
+input, button, a, label {
+    border: 1px solid black;
+    padding: 5px 20px;
+    font-size: 16px;
+    margin: 0 20px;
+    font-family: 'Alegreya Sans', sans-serif;
+    background-color: SteelBlue;
+    color: WhiteSmoke;
+}
+
+input[type="file"] {
+    display: none;
+}

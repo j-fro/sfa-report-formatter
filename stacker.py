@@ -15,7 +15,6 @@ class FormatThread(object):
     def run(self):
         self.output_file = self.file_name.rsplit('.', 1)[0] + '.csv'
         self.status = "Getting Settings"
-        # format_file(self.file_name, 'config.yml', self.file_name.rsplit('.', 1)[0] + '.csv')
         with open('config.yml') as settings_file:
             settings = yaml.load(settings_file)
             self.status = "Arranging Headers"

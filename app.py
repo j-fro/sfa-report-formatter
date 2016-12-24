@@ -7,18 +7,18 @@ from stacker import FormatThread
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])
 
-APP = Flask(__name__, static_url_path='')
-APP.config['UPLOAD_FOLDER'] = 'uploads'
+app = Flask(__name__, static_url_path='')
+app.config['UPLOAD_FOLDER'] = 'uploads'
 
 def allowed_filename(filename):
     """Checks whether a file has an allowed extension"""
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@APP.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     """Base url"""
     if request.method == 'POST':
-        clear_uploads(APP.config['UPLOAD_FOLDER'])
+        clear_uploads(app.config['UPLOAD_FOLDER'])
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
@@ -28,16 +28,16 @@ def index():
             return redirect(request.url)
         if file and allowed_filename(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            thread.file_name = os.path.join(APP.config['UPLOAD_FOLDER'], filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            thread.file_name = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             thread.thread = Thread(target=thread.run)
             thread.thread.start()
-            APP.config['FILE_NAME'] = filename.rsplit('.', 1)[0]
+            app.config['FILE_NAME'] = filename.rsplit('.', 1)[0]
         return render_template('uploaded.html')
     else:
         return render_template('index.html')
 
-@APP.route('/poll', methods=['GET'])
+@app.route('/poll', methods=['GET'])
 def poll():
     """Route for polling the server on the status of the file transformation"""
     return jsonify({
@@ -45,19 +45,19 @@ def poll():
         'outputFile': thread.output_file
     })
 
-@APP.route('/download', methods=['GET'])
+@app.route('/download', methods=['GET'])
 def download():
     """Route to serve the transformed file back to the user"""
     return send_from_directory('', thread.output_file)
 
 def clear_uploads(upload_dir):
-    for f in os.listdir(upload_dir):
-        os.remove(os.path.join(upload_dir, f))
+    for file_name in os.listdir(upload_dir):
+        os.remove(os.path.join(upload_dir, file_name))
 
 if __name__ == '__main__':
     if not os.path.isdir('uploads'):
         os.mkdir('uploads')
     thread = FormatThread()
     port = int(os.environ.get('PORT', 5000))
-    APP.run(host='0.0.0.0', port=port)
-    APP.run()
+    app.run(host='localhost', port=port)
+    app.run()
