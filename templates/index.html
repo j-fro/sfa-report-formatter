@@ -12,21 +12,21 @@
 <body>
     <h1>Saks Style Report Formatter</h1>
     <form action="" method="post" enctype="multipart/form-data">
-        <!-- <label class="custom-file-upload"> -->
-            <input type="file" id="file-upload"/>
+        <label class="custom-file-upload">
+            <input type="file" id="file-upload" name="file"/>
             Choose a File
-        <!-- </label> -->
+        </label>
         <input type="submit" id="uploadButton" value="Upload">
     </form>
     <p id="file-selected"></p>
     <script type="text/javascript" src="{{
   url_for('static', filename='jquery-3.1.1.min.js') }}"></script>
   <script type="text/javascript" src="../static/jquery-3.1.1.min.js"></script>
-    <!-- <script type="text/javascript">
+    <script type="text/javascript">
         $('#file-upload').bind('change', function() {
             var fileName = ''; fileName = $(this).val(); $('#file-selected').html(fileName);
         })
-    </script> -->
+    </script>
 </body>
 
 </html>
