@@ -2,6 +2,13 @@
 body {
     text-align: center;
     font-family: 'Alegreya Sans', sans-serif;
+    position: fixed;
+    width: 1000px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    margin-left: -500px;
+    margin-top: -100px;
 }
 
 h1 {
