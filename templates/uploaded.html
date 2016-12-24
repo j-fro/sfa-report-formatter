@@ -5,9 +5,10 @@
     <meta charset="utf-8">
     <title>Saks Style Report Formatter</title>
     <link rel="stylesheet" href="{{
-  url_for('static', filename='style.css') }}">
-  <link rel="stylesheet" href="../static/style.css">
-  <link rel="stylesheet" href="../static/font-awesome.min.css">
+        url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{
+        url_for('static', filename='font-awesome.min.css') }}">
+
 </head>
 
 <body>
@@ -15,7 +16,6 @@
     <p><i class="fa fa-cog fa-spin fa-lg"></i></p>
     <p id="status">Starting Transform</p>
     <a id="download" href="/download"></a>
-    <script type="text/javascript" src="../static/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="{{
   url_for('static', filename='jquery-3.1.1.min.js') }}"></script>
     <script type="text/javascript">
