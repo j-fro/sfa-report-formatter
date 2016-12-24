@@ -1,19 +1,16 @@
 from threading import Thread
 import csv
-from time import sleep
 import pandas as pd
 from openpyxl import load_workbook
 import yaml
 
 
-class FormatThread(Thread):
-    def __init__(self, threadID, name):
-        Thread.__init__(self)
-        self.name = name
-        self.thread_id = threadID
+class FormatThread(object):
+    def __init__(self):
         self.file_name = ""
         self.status = "Starting"
         self.output_file = ""
+        self.thread = Thread(target=self.run)
 
     def run(self):
         self.output_file = self.file_name.rsplit('.', 1)[0] + '.csv'
