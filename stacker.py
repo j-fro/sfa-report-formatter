@@ -21,10 +21,12 @@ class FormatThread(object):
         print(self.status)
         self.status = formatter(self.file_name, settings, 'intermediate.csv')
         print(self.status)
-        self.status = output(stacker('intermediate.csv', settings), 'intermediate.csv')
+        self.status = output(
+            stacker('intermediate.csv', settings), 'intermediate.csv')
         print(self.status)
         self.status = final_formatting('intermediate.csv', self.output_file)
         print(self.status)
+
 
 def formatter(inbound_path, settings, outbound_path):
     """Reads the excel sheet and formats it for later transformations.
@@ -38,7 +40,8 @@ def formatter(inbound_path, settings, outbound_path):
                 new_row = []
                 for col_num, cell in enumerate(row):
                     if col_num >= settings['First Store Column'] - 1:
-                        new_row.append(combine_store_and_type(sheet, cell, col_num, settings))
+                        new_row.append(combine_store_and_type(
+                            sheet, cell, col_num, settings))
                     else:
                         new_row.append(cell.value)
                 row = new_row
@@ -46,6 +49,7 @@ def formatter(inbound_path, settings, outbound_path):
                 row = [c.value for c in row]
             writer.writerow(row)
     return "Rotating"
+
 
 def combine_store_and_type(sheet, cell, col_num, settings):
     store = sheet.cell(row=settings['Store Row'], column=(
@@ -55,19 +59,23 @@ def combine_store_and_type(sheet, cell, col_num, settings):
     )).value
     return str(cell.value) + ',' + store
 
+
 def stacker(path, settings):
     # print("Stacking data")
     report = pd.read_csv(
         path,
         header=settings["Type Row"] - 1,
         index_col=settings["Index Columns"],
+        usecols=range(settings["Style Column"], settings["Last Column"])
     )
     return report.stack()
+
 
 def output(report, path):
     # print("Saving workbook to " + path)
     report.to_frame(name="Values").to_csv(path)
     return "Cleaning Up"
+
 
 def format_file(inbound_path, settings_path, outbound_path):
     print("Getting settings")
@@ -78,6 +86,7 @@ def format_file(inbound_path, settings_path, outbound_path):
     final_formatting('intermediate.csv', outbound_path)
     print('Format complete. Saved to ' + outbound_path)
 
+
 def final_formatting(inbound_path, outbound_path):
     with open(inbound_path, 'r') as inbound_file:
         with open(outbound_path, 'w') as outbound_file:
@@ -85,10 +94,12 @@ def final_formatting(inbound_path, outbound_path):
             writer = csv.writer(outbound_file)
             for index, row in enumerate(reader):
                 if index == 0:
-                    writer.writerow(['Dept', 'Style', 'Type', 'Store', 'Values'])
+                    writer.writerow(
+                        ['Dept', 'Style', 'Type', 'Store', 'Values'])
                 else:
                     writer.writerow(row[:2] + row[2].split(',') + row[3:])
     return "Complete"
+
 
 if __name__ == '__main__':
     with open("config.yml") as file:
